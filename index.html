@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Blood Donation Campaign Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+  <style>
+    @media print {
+      body {
+        width: 210mm;
+        height: 297mm;
+      }
+      #tracker {
+        width: 100%;
+        margin: 0;
+        padding: 20mm;
+        font-size: 12pt;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 p-4 font-sans">
+
+  <div id="tracker" class="bg-white p-6 mx-auto max-w-4xl rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold text-center text-red-600 mb-6">Blood Donation Campaign Tracker</h1>
+
+    <!-- Editable Info -->
+    <div class="text-gray-700 space-y-4 mb-6">
+      <div>
+        <label class="font-semibold">📍 Place:</label>
+        <input id="placeInput" type="text" placeholder="Enter location" class="w-full mt-1 p-2 border rounded" />
+      </div>
+      <div>
+        <label class="font-semibold">🏢 Organizer:</label>
+        <input id="organizerInput" type="text" placeholder="Enter organizer" class="w-full mt-1 p-2 border rounded" />
+      </div>
+      <div>
+        <label class="font-semibold">📅 Date:</label>
+        <input id="dateInput" type="date" class="w-full mt-1 p-2 border rounded" />
+      </div>
+      <button onclick="saveDetails()" class="bg-red-500 text-white w-full py-2 rounded hover:bg-red-600">
+        Save Details
+      </button>
+    </div>
+
+    <!-- Display Info -->
+    <div id="campaignDetails" class="hidden text-gray-800 mb-6">
+      <p><strong>📍 Place:</strong> <span id="placeDisplay"></span></p>
+      <p><strong>🏢 Organizer:</strong> <span id="organizerDisplay"></span></p>
+      <p><strong>📅 Date:</strong> <span id="dateDisplay"></span></p>
+    </div>
+
+    <!-- Counter Section -->
+    <div id="counterSection" class="hidden space-y-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-center">
+        <div class="bg-red-100 border border-red-300 p-4 rounded">
+          <p class="font-medium text-red-700">Organ Pledging</p>
+          <p id="pledgingCount" class="text-3xl font-bold text-red-700 mt-2">0</p>
+          <button onclick="increment('pledgingCount')" class="mt-2 bg-red-500 text-white px-3 py-1 rounded text-sm">+ Add</button>
+        </div>
+        <div class="bg-blue-100 border border-blue-300 p-4 rounded">
+          <p class="font-medium text-blue-700">New Donor</p>
+          <p id="newDonorCount" class="text-3xl font-bold text-blue-700 mt-2">0</p>
+          <button onclick="increment('newDonorCount')" class="mt-2 bg-blue-500 text-white px-3 py-1 rounded text-sm">+ Add</button>
+        </div>
+      </div>
+
+      <!-- Manual Total Input -->
+      <div class="text-center">
+        <h2 class="text-xl font-semibold text-gray-800">✅ Total Successful Donations</h2>
+        <input id="manualTotal" type="number" placeholder="Enter total" class="mt-2 w-1/2 p-2 border rounded text-center text-xl font-bold text-green-600" />
+      </div>
+
+      <!-- PDF Export -->
+      <div class="text-center mt-4">
+        <button onclick="generatePDF()" class="bg-gray-800 text-white px-6 py-2 rounded text-sm">
+          📄 Generate A4 PDF Report
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function saveDetails() {
+      const place = document.getElementById("placeInput").value.trim();
+      const organizer = document.getElementById("organizerInput").value.trim();
+      const date = document.getElementById("dateInput").value;
+
+      if (!place || !organizer || !date) {
+        alert("Please fill in Place, Organizer, and Date.");
+        return;
+      }
+
+      document.getElementById("placeDisplay").textContent = place;
+      document.getElementById("organizerDisplay").textContent = organizer;
+      document.getElementById("dateDisplay").textContent = date;
+
+      document.getElementById("campaignDetails").classList.remove("hidden");
+      document.getElementById("counterSection").classList.remove("hidden");
+    }
+
+    function increment(id) {
+      const el = document.getElementById(id);
+      let count = parseInt(el.textContent);
+      el.textContent = ++count;
+    }
+
+    function generatePDF() {
+      const total = document.getElementById("manualTotal").value;
+      if (!total) {
+        alert("Please enter the total successful donations.");
+        return;
+      }
+
+      const tempLine = document.createElement('p');
+      tempLine.innerHTML = `<strong>Total Successful Donations:</strong> ${total}`;
+      document.getElementById("tracker").appendChild(tempLine);
+
+      const opt = {
+        margin:       0.5,
+        filename:     'blood_donation_report.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(document.getElementById("tracker")).save();
+
+      setTimeout(() => tempLine.remove(), 1000);
+    }
+  </script>
+
+</body>
+</html>
