@@ -5,18 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Blood Donation Campaign Tracker</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
   <style>
     @media print {
       body {
+        margin: 0;
+        padding: 0;
         width: 210mm;
         height: 297mm;
-        overflow: hidden;
       }
       #tracker {
         width: 100%;
         padding: 15mm;
         font-size: 11pt;
+        box-sizing: border-box;
         page-break-inside: avoid;
       }
     }
@@ -143,22 +145,23 @@
         return;
       }
 
-      const tempLine = document.createElement('p');
-      tempLine.innerHTML = `<strong>Total Successful Donations:</strong> ${total}`;
-      tempLine.style.marginTop = '10px';
-      document.getElementById("tracker").appendChild(tempLine);
+      const totalElem = document.getElementById("manualTotal");
+      const totalLabel = document.createElement('p');
+      totalLabel.innerHTML = `<strong>Total Successful Donations:</strong> ${total}`;
+      totalLabel.style.marginTop = '10px';
+      totalElem.parentElement.appendChild(totalLabel);
 
       const opt = {
-        margin:       0,
-        filename:     'blood_donation_report.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 1 },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        margin: 10,
+        filename: 'blood_donation_report.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 1 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
       html2pdf().set(opt).from(document.getElementById("tracker")).save();
 
-      setTimeout(() => tempLine.remove(), 1000);
+      setTimeout(() => totalLabel.remove(), 1000);
     }
   </script>
 
