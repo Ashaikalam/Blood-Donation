@@ -56,6 +56,11 @@
     <!-- Counter Section -->
     <div id="counterSection" class="hidden space-y-4 text-sm">
       <div class="grid grid-cols-2 gap-3 text-center">
+        <div class="bg-yellow-100 border p-2 rounded">
+          <p class="font-medium text-red-700">Blood Donor</p>
+          <p id="DCount" class="text-xl font-bold text-red-700">0</p>
+          <button onclick="increment('DCount')" class="mt-1 bg-red-500 text-white px-2 py-1 rounded text-xs">+ Add</button>
+        </div>
         <div class="bg-red-100 border p-2 rounded">
           <p class="font-medium text-red-700">Organ Pledging</p>
           <p id="pledgingCount" class="text-xl font-bold text-red-700">0</p>
@@ -76,6 +81,12 @@
           <p id="DayCount" class="text-xl font-bold text-purple-700">0</p>
           <button onclick="increment('DayCount')" class="mt-1 bg-purple-500 text-white px-2 py-1 rounded text-xs">+ Add</button>
         </div>
+      </div>
+
+      <!-- Total Registered Display -->
+      <div class="text-center">
+        <h2 class="text-base font-semibold text-gray-800 mt-4">🧾 Total Registered</h2>
+        <p id="totalRegistered" class="text-lg font-bold text-blue-600">0</p>
       </div>
 
       <!-- Manual Total Input -->
@@ -116,6 +127,13 @@
       const el = document.getElementById(id);
       let count = parseInt(el.textContent);
       el.textContent = ++count;
+      updateTotalRegistered();
+    }
+
+    function updateTotalRegistered() {
+      const donors = parseInt(document.getElementById("DCount").textContent);
+      const newDonors = parseInt(document.getElementById("newDonorCount").textContent);
+      document.getElementById("totalRegistered").textContent = donors + newDonors;
     }
 
     function generatePDF() {
