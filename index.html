@@ -11,12 +11,13 @@
       body {
         width: 210mm;
         height: 297mm;
+        overflow: hidden;
       }
       #tracker {
         width: 100%;
-        margin: 0;
-        padding: 20mm;
-        font-size: 12pt;
+        padding: 15mm;
+        font-size: 11pt;
+        page-break-inside: avoid;
       }
     }
   </style>
@@ -24,58 +25,68 @@
 <body class="bg-gray-100 p-4 font-sans">
 
   <div id="tracker" class="bg-white p-6 mx-auto max-w-4xl rounded-lg shadow-md">
-    <h1 class="text-2xl font-bold text-center text-red-600 mb-6">Blood Donation Campaign Tracker</h1>
+    <h1 class="text-xl font-bold text-center text-red-600 mb-4">Blood Donation Campaign Tracker</h1>
 
     <!-- Editable Info -->
-    <div class="text-gray-700 space-y-4 mb-6">
+    <div class="text-gray-700 space-y-3 mb-4">
       <div>
         <label class="font-semibold">📍 Place:</label>
-        <input id="placeInput" type="text" placeholder="Enter location" class="w-full mt-1 p-2 border rounded" />
+        <input id="placeInput" type="text" placeholder="Enter location" class="w-full mt-1 p-1 border rounded text-sm" />
       </div>
       <div>
         <label class="font-semibold">🏢 Organizer:</label>
-        <input id="organizerInput" type="text" placeholder="Enter organizer" class="w-full mt-1 p-2 border rounded" />
+        <input id="organizerInput" type="text" placeholder="Enter organizer" class="w-full mt-1 p-1 border rounded text-sm" />
       </div>
       <div>
         <label class="font-semibold">📅 Date:</label>
-        <input id="dateInput" type="date" class="w-full mt-1 p-2 border rounded" />
+        <input id="dateInput" type="date" class="w-full mt-1 p-1 border rounded text-sm" />
       </div>
-      <button onclick="saveDetails()" class="bg-red-500 text-white w-full py-2 rounded hover:bg-red-600">
+      <button onclick="saveDetails()" class="bg-red-500 text-white w-full py-1 rounded hover:bg-red-600 text-sm">
         Save Details
       </button>
     </div>
 
     <!-- Display Info -->
-    <div id="campaignDetails" class="hidden text-gray-800 mb-6">
+    <div id="campaignDetails" class="hidden text-gray-800 text-sm mb-4">
       <p><strong>📍 Place:</strong> <span id="placeDisplay"></span></p>
       <p><strong>🏢 Organizer:</strong> <span id="organizerDisplay"></span></p>
       <p><strong>📅 Date:</strong> <span id="dateDisplay"></span></p>
     </div>
 
     <!-- Counter Section -->
-    <div id="counterSection" class="hidden space-y-6">
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-center">
-        <div class="bg-red-100 border border-red-300 p-4 rounded">
+    <div id="counterSection" class="hidden space-y-4 text-sm">
+      <div class="grid grid-cols-2 gap-3 text-center">
+        <div class="bg-red-100 border p-2 rounded">
           <p class="font-medium text-red-700">Organ Pledging</p>
-          <p id="pledgingCount" class="text-3xl font-bold text-red-700 mt-2">0</p>
-          <button onclick="increment('pledgingCount')" class="mt-2 bg-red-500 text-white px-3 py-1 rounded text-sm">+ Add</button>
+          <p id="pledgingCount" class="text-xl font-bold text-red-700">0</p>
+          <button onclick="increment('pledgingCount')" class="mt-1 bg-red-500 text-white px-2 py-1 rounded text-xs">+ Add</button>
         </div>
-        <div class="bg-blue-100 border border-blue-300 p-4 rounded">
+        <div class="bg-blue-100 border p-2 rounded">
           <p class="font-medium text-blue-700">New Donor</p>
-          <p id="newDonorCount" class="text-3xl font-bold text-blue-700 mt-2">0</p>
-          <button onclick="increment('newDonorCount')" class="mt-2 bg-blue-500 text-white px-3 py-1 rounded text-sm">+ Add</button>
+          <p id="newDonorCount" class="text-xl font-bold text-blue-700">0</p>
+          <button onclick="increment('newDonorCount')" class="mt-1 bg-blue-500 text-white px-2 py-1 rounded text-xs">+ Add</button>
+        </div>
+        <div class="bg-green-100 border p-2 rounded">
+          <p class="font-medium text-green-700">Influenza Jab</p>
+          <p id="jabCount" class="text-xl font-bold text-green-700">0</p>
+          <button onclick="increment('jabCount')" class="mt-1 bg-green-500 text-white px-2 py-1 rounded text-xs">+ Add</button>
+        </div>
+        <div class="bg-purple-100 border p-2 rounded">
+          <p class="font-medium text-purple-700">Recognition Day</p>
+          <p id="DayCount" class="text-xl font-bold text-purple-700">0</p>
+          <button onclick="increment('DayCount')" class="mt-1 bg-purple-500 text-white px-2 py-1 rounded text-xs">+ Add</button>
         </div>
       </div>
 
       <!-- Manual Total Input -->
       <div class="text-center">
-        <h2 class="text-xl font-semibold text-gray-800">✅ Total Successful Donations</h2>
-        <input id="manualTotal" type="number" placeholder="Enter total" class="mt-2 w-1/2 p-2 border rounded text-center text-xl font-bold text-green-600" />
+        <h2 class="text-base font-semibold text-gray-800 mt-4">✅ Total Successful Donations</h2>
+        <input id="manualTotal" type="number" placeholder="Enter total" class="mt-1 w-1/2 p-1 border rounded text-center text-lg font-bold text-green-600" />
       </div>
 
       <!-- PDF Export -->
-      <div class="text-center mt-4">
-        <button onclick="generatePDF()" class="bg-gray-800 text-white px-6 py-2 rounded text-sm">
+      <div class="text-center mt-3">
+        <button onclick="generatePDF()" class="bg-gray-800 text-white px-4 py-1 rounded text-sm">
           📄 Generate A4 PDF Report
         </button>
       </div>
@@ -116,14 +127,15 @@
 
       const tempLine = document.createElement('p');
       tempLine.innerHTML = `<strong>Total Successful Donations:</strong> ${total}`;
+      tempLine.style.marginTop = '10px';
       document.getElementById("tracker").appendChild(tempLine);
 
       const opt = {
-        margin:       0.5,
+        margin:       0,
         filename:     'blood_donation_report.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+        html2canvas:  { scale: 1 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
       html2pdf().set(opt).from(document.getElementById("tracker")).save();
