@@ -12,10 +12,7 @@
   <div id="tracker" class="bg-white p-6 mx-auto max-w-4xl rounded-lg shadow-md">
     <h1 class="text-xl font-bold text-center text-red-600 mb-4">Blood Donation Campaign Tracker</h1>
 
-    <input type="email" id="email" placeholder="Email" class="border p-1 rounded" />
-    <input type="password" id="password" placeholder="Password" class="border p-1 rounded" />
-    <button id="signupBtn" class="bg-blue-500 text-white px-3 py-1 rounded">Sign Up</button>
-    <button id="loginBtn" class="bg-green-500 text-white px-3 py-1 rounded">Login</button>
+    <button id="loginBtn" class="bg-green-600 text-white px-3 py-1 rounded mb-3">Login with GitHub</button>
 
     <!-- Editable Info -->
     <div class="text-gray-700 space-y-3 mb-4">
@@ -28,7 +25,7 @@
         <input id="organizerInput" type="text" class="w-full mt-1 p-1 border rounded text-sm" />
       </div>
       <div>
-        <label class="font-semibold">📅 Date:</label>
+        <label class="font-semibold">🗓 Date:</label>
         <input id="dateInput" type="date" class="w-full mt-1 p-1 border rounded text-sm" />
       </div>
       <button onclick="saveDetails()" class="bg-red-500 text-white w-full py-1 rounded hover:bg-red-600 text-sm">
@@ -40,7 +37,7 @@
     <div id="campaignDetails" class="hidden text-gray-800 text-sm mb-4">
       <p><strong>📍 Place:</strong> <span id="placeDisplay"></span></p>
       <p><strong>🏢 Organizer:</strong> <span id="organizerDisplay"></span></p>
-      <p><strong>📅 Date:</strong> <span id="dateDisplay"></span></p>
+      <p><strong>🗓 Date:</strong> <span id="dateDisplay"></span></p>
     </div>
 
     <!-- Counter Section -->
@@ -71,11 +68,24 @@
     </div>
   </div>
 
-  <!-- Firebase Setup -->
+  <!-- Firebase + GitHub Auth -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import {
+      getAuth,
+      signInWithPopup,
+      GithubAuthProvider,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+    import {
+      getFirestore,
+      doc,
+      setDoc,
+      getDoc,
+      updateDoc,
+      onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "YOUR_API_KEY",
@@ -90,29 +100,20 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    document.getElementById("signupBtn").addEventListener("click", async () => {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-
+    const loginBtn = document.getElementById("loginBtn");
+    loginBtn.addEventListener("click", async () => {
+      const provider = new GithubAuthProvider();
       try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        alert("Signup successful!");
+        await signInWithPopup(auth, provider);
       } catch (error) {
         alert(error.message);
       }
     });
 
-    document.getElementById("loginBtn").addEventListener("click", async () => {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        alert("Login successful!");
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
         const campaignId = localStorage.getItem("campaignId");
         if (campaignId) listenToCampaign(campaignId);
-      } catch (error) {
-        alert(error.message);
       }
     });
 
