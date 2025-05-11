@@ -87,14 +87,16 @@
       onSnapshot
     } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBY3_xyGEvS36jADBDaIBV9CAC9xQ7cpl8",
+  authDomain: "blood-donation-campaign-mrc.firebaseapp.com",
+  projectId: "blood-donation-campaign-mrc",
+  storageBucket: "blood-donation-campaign-mrc.firebasestorage.app",
+  messagingSenderId: "827702111142",
+  appId: "1:827702111142:web:40e5f5ecef8e6d9d8e7d67",
+  measurementId: "G-ZETVHJM6MP"
+};
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
