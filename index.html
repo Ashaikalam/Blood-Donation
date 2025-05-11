@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Blood Donation Campaign Tracker</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
@@ -28,6 +28,16 @@
 
   <div id="tracker" class="bg-white p-6 mx-auto max-w-4xl rounded-lg shadow-md">
     <h1 class="text-xl font-bold text-center text-red-600 mb-4">Blood Donation Campaign Tracker</h1>
+
+    <!-- Auth Section -->
+    <div class="mb-4">
+      <input type="email" id="email" placeholder="Email" class="w-full mb-2 p-2 border rounded text-sm" />
+      <input type="password" id="password" placeholder="Password" class="w-full mb-2 p-2 border rounded text-sm" />
+      <div class="flex gap-2">
+        <button id="signupBtn" class="bg-blue-600 text-white px-4 py-1 rounded">Sign Up</button>
+        <button id="loginBtn" class="bg-green-600 text-white px-4 py-1 rounded">Login</button>
+      </div>
+    </div>
 
     <!-- Editable Info -->
     <div class="text-gray-700 space-y-3 mb-4">
@@ -85,19 +95,16 @@
         </div>
       </div>
 
-      <!-- Total Registered Display -->
       <div class="text-center">
         <h2 class="text-base font-semibold text-gray-800 mt-4">🧾 Total Registered</h2>
         <p id="totalRegistered" class="text-lg font-bold text-blue-600">0</p>
       </div>
 
-      <!-- Manual Total Input -->
       <div class="text-center">
         <h2 class="text-base font-semibold text-gray-800 mt-4">✅ Total Successful Donations</h2>
         <input id="manualTotal" type="number" placeholder="Enter total" class="mt-1 w-1/2 p-1 border rounded text-center text-lg font-bold text-green-600" />
       </div>
 
-      <!-- PDF Export -->
       <div class="text-center mt-3">
         <button onclick="generatePDF()" class="bg-gray-800 text-white px-4 py-1 rounded text-sm">
           📄 Generate A4 PDF Report
@@ -107,48 +114,50 @@
   </div>
 
   <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, doc, setDoc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyBY3_xyGEvS36jADBDaIBV9CAC9xQ7cpl8",
+      authDomain: "blood-donation-campaign-mrc.firebaseapp.com",
+      projectId: "blood-donation-campaign-mrc",
+      storageBucket: "blood-donation-campaign-mrc.appspot.com",
+      messagingSenderId: "827702111142",
+      appId: "1:827702111142:web:40e5f5ecef8e6d9d8e7d67",
+      measurementId: "G-ZETVHJM6MP"
     };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-  </script>
-    
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBY3_xyGEvS36jADBDaIBV9CAC9xQ7cpl8",
-    authDomain: "blood-donation-campaign-mrc.firebaseapp.com",
-    projectId: "blood-donation-campaign-mrc",
-    storageBucket: "blood-donation-campaign-mrc.firebasestorage.app",
-    messagingSenderId: "827702111142",
-    appId: "1:827702111142:web:40e5f5ecef8e6d9d8e7d67",
-    measurementId: "G-ZETVHJM6MP"
-  };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
+    let campaignDocRef = null;
 
-  <!-- Core Logic -->
-  <script>
-    function saveDetails() {
+    document.getElementById("signupBtn").addEventListener("click", async () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        alert("Signup successful!");
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        alert("Login successful!");
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    window.saveDetails = async function () {
       const place = document.getElementById("placeInput").value.trim();
       const organizer = document.getElementById("organizerInput").value.trim();
       const date = document.getElementById("dateInput").value;
@@ -169,43 +178,38 @@
         DayCount: 0
       };
 
-      const campaignRef = db.ref("campaigns").push();
-      campaignRef.set(campaignData);
-
-      localStorage.setItem("campaignId", campaignRef.key);
-
+      campaignDocRef = await addDoc(collection(db, "campaigns"), campaignData);
       document.getElementById("placeDisplay").textContent = place;
       document.getElementById("organizerDisplay").textContent = organizer;
       document.getElementById("dateDisplay").textContent = date;
       document.getElementById("campaignDetails").classList.remove("hidden");
       document.getElementById("counterSection").classList.remove("hidden");
-    }
+    };
 
-    function increment(id) {
+    window.increment = async function (id) {
       const el = document.getElementById(id);
       let count = parseInt(el.textContent);
-      el.textContent = ++count;
+      count++;
+      el.textContent = count;
       updateTotalRegistered();
 
-      const campaignId = localStorage.getItem("campaignId");
-      if (campaignId) {
-        db.ref(`campaigns/${campaignId}/${id}`).set(count);
+      if (campaignDocRef) {
+        await updateDoc(campaignDocRef, { [id]: count });
       }
-    }
+    };
 
-    function updateTotalRegistered() {
+    window.updateTotalRegistered = function () {
       const donors = parseInt(document.getElementById("DCount").textContent);
       const newDonors = parseInt(document.getElementById("newDonorCount").textContent);
       document.getElementById("totalRegistered").textContent = donors + newDonors;
-    }
+    };
 
-    function generatePDF() {
+    window.generatePDF = function () {
       const total = document.getElementById("manualTotal").value;
       if (!total) {
         alert("Please enter the total successful donations.");
         return;
       }
-
       const totalElem = document.getElementById("manualTotal");
       const totalLabel = document.createElement('p');
       totalLabel.innerHTML = `<strong>Total Successful Donations:</strong> ${total}`;
@@ -224,28 +228,6 @@
 
       setTimeout(() => totalLabel.remove(), 1000);
     }
-
-    window.onload = function () {
-      const campaignId = localStorage.getItem("campaignId");
-      if (campaignId) {
-        db.ref(`campaigns/${campaignId}`).on("value", (snapshot) => {
-          const data = snapshot.val();
-          if (data) {
-            document.getElementById("placeDisplay").textContent = data.place;
-            document.getElementById("organizerDisplay").textContent = data.organizer;
-            document.getElementById("dateDisplay").textContent = data.date;
-
-            ["DCount", "pledgingCount", "newDonorCount", "jabCount", "DayCount"].forEach((id) => {
-              document.getElementById(id).textContent = data[id] || 0;
-            });
-
-            document.getElementById("campaignDetails").classList.remove("hidden");
-            document.getElementById("counterSection").classList.remove("hidden");
-            updateTotalRegistered();
-          }
-        });
-      }
-    };  
   </script>
 </body>
 </html>
