@@ -106,6 +106,24 @@
     </div>
   </div>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+  </script>
+
+  <!-- Core Logic -->
   <script>
     function saveDetails() {
       const place = document.getElementById("placeInput").value.trim();
@@ -117,10 +135,25 @@
         return;
       }
 
+      const campaignData = {
+        place,
+        organizer,
+        date,
+        DCount: 0,
+        pledgingCount: 0,
+        newDonorCount: 0,
+        jabCount: 0,
+        DayCount: 0
+      };
+
+      const campaignRef = db.ref("campaigns").push();
+      campaignRef.set(campaignData);
+
+      localStorage.setItem("campaignId", campaignRef.key);
+
       document.getElementById("placeDisplay").textContent = place;
       document.getElementById("organizerDisplay").textContent = organizer;
       document.getElementById("dateDisplay").textContent = date;
-
       document.getElementById("campaignDetails").classList.remove("hidden");
       document.getElementById("counterSection").classList.remove("hidden");
     }
@@ -130,6 +163,11 @@
       let count = parseInt(el.textContent);
       el.textContent = ++count;
       updateTotalRegistered();
+
+      const campaignId = localStorage.getItem("campaignId");
+      if (campaignId) {
+        db.ref(`campaigns/${campaignId}/${id}`).set(count);
+      }
     }
 
     function updateTotalRegistered() {
@@ -163,7 +201,28 @@
 
       setTimeout(() => totalLabel.remove(), 1000);
     }
-  </script>
 
+    window.onload = function () {
+      const campaignId = localStorage.getItem("campaignId");
+      if (campaignId) {
+        db.ref(`campaigns/${campaignId}`).on("value", (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            document.getElementById("placeDisplay").textContent = data.place;
+            document.getElementById("organizerDisplay").textContent = data.organizer;
+            document.getElementById("dateDisplay").textContent = data.date;
+
+            ["DCount", "pledgingCount", "newDonorCount", "jabCount", "DayCount"].forEach((id) => {
+              document.getElementById(id).textContent = data[id] || 0;
+            });
+
+            document.getElementById("campaignDetails").classList.remove("hidden");
+            document.getElementById("counterSection").classList.remove("hidden");
+            updateTotalRegistered();
+          }
+        });
+      }
+    };
+  </script>
 </body>
 </html>
